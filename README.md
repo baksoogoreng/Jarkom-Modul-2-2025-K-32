@@ -5,7 +5,7 @@
 |1. | Tasya Aulia Darmawan | 5027241009|
 |2. | Ahmad Rafi F D | 5027241068|
 
-## **Soal 1
+## Soal 1
 Eonwe merentangkan tiga jalur:
 
 - **Barat** → Earendil & Elwing  
@@ -21,7 +21,7 @@ Di tepi Beleriand yang porak-poranda, Eonwe merentangkan tiga jalur: Barat untuk
 
 ---
 
-### **1. Eonwe (Router / NAT)**
+### 1. Eonwe (Router / NAT)
 
 ```bash
 auto eth0
@@ -68,7 +68,7 @@ echo nameserver 192.168.122.1 > /etc/resolv.conf
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 192.227.0.0/16
 ```
 
-### **2. Client Barat (Earendil & Elwing)**
+### 2. Client Barat (Earendil & Elwing)
 ```
 # Earendil
 auto eth0
@@ -92,7 +92,7 @@ echo nameserver 192.168.122.1 > /etc/resolv.conf
 echo nameserver 192.168.122.1 > /etc/resolv.conf  # DNS Resolver
 ```
 
-### **2. Client Timur**
+### 3. Client Timur
 ```
 auto eth0
 iface eth0 inet static
