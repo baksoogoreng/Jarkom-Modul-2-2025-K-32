@@ -1,4 +1,5 @@
-# Praktikum Modul 2 Jarkom
+
+# Laporan Resmi Praktikum Modul 2 Jarkom
 
 |No|Nama anggota|NRP|
 |---|---|---|
