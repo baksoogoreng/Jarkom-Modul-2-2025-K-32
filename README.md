@@ -14,7 +14,6 @@ Eonwe merentangkan tiga jalur:
 - **DMZ / Pelabuhan** → Sirion, Tirion, Valmar, Lindon, Vingilot  
 
 Konfigurasi IP, gateway, dan DNS disesuaikan dengan glosarium yang diberikan.
-![assets/no1.jpg](assets/no1.png)
 ---
 
 ## Soal 1
@@ -286,6 +285,9 @@ Verifikasi Authoritative DNS
 dig @192.227.3.3 K32.com      # Jawaban dari ns1 (master)
 dig @192.227.3.4 K32.com      # Jawaban dari ns2 (slave)
 ```
+![Assets/no4.png](Assets/no4.png)
+---
+
 ## Soal 5
 Memberi hostname pada seluruh node sesuai glosarium dan menambahkan A record tiap host dalam zona K32.com agar semua perangkat dapat saling mengenali menggunakan nama domain masing-masing secara system-wide, kecuali untuk node ns1 dan ns2.
 
@@ -353,6 +355,8 @@ nameserver 192.227.3.3   # ns1 (Tirion)
 nameserver 192.227.3.4   # ns2 (Valmar)
 nameserver 192.168.122.1
 ```
+![Assets/no5.png](Assets/no5.png)
+---
 ## Soal 6
 Memastikan zona K32.com tersinkron antara Tirion (ns1/master) dan Valmar (ns2/slave) dengan melakukan pengecekan nilai serial SOA. Jika berbeda, lakukan zone retransfer agar Valmar memperoleh salinan zona terbaru dari Tirion.
 
@@ -378,7 +382,8 @@ Setelah retransfer, pastikan nilai serial SOA sudah sama antara Tirion dan Valma
 ```
 dig @192.227.3.4 K32.com SOA
 ```
-
+![Assets/no6.png](Assets/no6.png)
+---
 ## Soal 7
 Menambahkan record DNS untuk server web di zona K32.com, yaitu Sirion (gateway utama), Lindon (web statis), dan Vingilot (web dinamis). Kemudian menetapkan CNAME agar www.K32.com, static.K32.com, dan app.K32.com mengarah ke masing-masing host terkait, serta memverifikasi bahwa seluruh hostname dapat di-resolve dengan benar dari dua klien berbeda.
 
@@ -436,7 +441,8 @@ vingilot.K32.com. IN A      192.227.3.6
 app.K32.com.      IN CNAME  vingilot.K32.com.
                   IN A      192.227.3.6
 ```
-
+![Assets/no7.png](Assets/no7.png)
+---
 ## Soal 8
 Buat reverse zone di Tirion (ns1) untuk segmen DMZ tempat Sirion, Lindon, dan Vingilot, lalu konfigurasikan Valmar (ns2) sebagai slave zone-nya. Tambahkan PTR agar pencarian balik IP mengembalikan hostname yang benar dan pastikan hasil query bersifat authoritative.
 
@@ -520,6 +526,9 @@ Expected output:
 dan terdapat flag
 ;; flags: qr aa rd ra;
 ```
+![Assets/no8.png](Assets/no8.png)
+![Assets/no8.png](Assets/no8.1.png)
+
 Pastikan sinkronisasi Master & Slave
  Di Tirion
 ``` dig @192.227.3.3 3.227.192.in-addr.arpa SOA +short ```
@@ -590,9 +599,17 @@ service apache2 status
 For Checking, in Earendil, do:
 ```
 curl http://static.K32.com/index.html
+```
+![Assets/no9.png](Assets/no9.png)
+```
 curl http://static.K32.com/annals/catatan1.txt
+```
+![Assets/no9.png](Assets/no9.1.png)
+```
 curl http://static.K32.com/annals/catatan2.txt
 ```
+![Assets/no9.png](Assets/no9.2.png)
+
 ## Soal 10
 Menjalankan web dinamis (PHP-FPM) di server Vingilot dengan hostname app.<xxxx>.com.
 Buat dua halaman, yaitu beranda (index.php) dan about.php, lalu terapkan rewrite rule agar halaman /about bisa diakses tanpa menuliskan .php di URL.
@@ -689,6 +706,10 @@ ping app.K32.com
 curl http://app.K32.com/
 curl http://app.K32.com/about
 ```
+![Assets/no10.png](Assets/no10.png)
+![Assets/no10.png](Assets/no10.1.png)
+![Assets/no10.png](Assets/no10.2.png)
+
 ## Soal 11
 Menjadikan Sirion sebagai reverse proxy dengan path-based routing sehingga /static diteruskan ke Lindon dan /app diteruskan ke Vingilot, sambil meneruskan header Host dan X-Real-IP, serta menerima www.K32.com (kanonik) dan sirion.K32.com.
 
@@ -763,6 +784,8 @@ curl http://www.K32.com/static/annals/catatan2.txt
 curl http://www.K32.com/app/
 curl http://www.K32.com/app/about
 ```
+![Assets/no11.png](Assets/no11.png)
+
 ## Soal 12
 Melindungi direktori /admin di Sirion menggunakan Basic Authentication, sehingga akses tanpa kredensial ditolak (401 Unauthorized) dan hanya pengguna dengan username–password yang benar yang dapat masuk.
 
@@ -840,6 +863,9 @@ curl -i http://www.K32.com/admin/
 # Akses dengan kredensial benar (harus berhasil)
 curl -i -u admin:rahasia http://www.K32.com/admin/
 ```
+![Assets/no12.png](Assets/no12.png)
+![Assets/no12.png](Assets/no12.1.png)
+
 ## Soal 13
 Konfigurasi agar semua akses menuju IP Sirion atau sirion.K32.com secara otomatis diarahkan (redirect 301) ke www.K32.com sebagai hostname utama (canonical host).
 
