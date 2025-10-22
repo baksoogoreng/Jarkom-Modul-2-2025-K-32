@@ -1133,22 +1133,368 @@ dig @192.227.3.3 static.K32.com A
 # harus berubah
 ```
 ## Soal 17
-K
+Memastikan bahwa seluruh layanan utama di setiap server akan otomatis aktif kembali setelah sistem direboot. Fokusnya adalah memastikan bahwa layanan DNS, web server, dan PHP-FPM dapat autostart agar sistem tetap berfungsi tanpa intervensi manual.
 
 ---
-1. D
+1. Di Tirion (ns1)
+```
+nano /etc/rc.local
+```
+Isi file:
+```
+#!/bin/sh -e
+# rc.local — startup commands here
+
+# Start Bind9 (DNS server)
+service bind9 start
+
+exit 0
+```
+Lalu:
+```
+chmod +x /etc/rc.local
+bash -x /etc/rc.local
+ps aux | grep named
+dig @127.0.0.1 www.K32.com
+```
+2. Di Valmar (ns2)
+```
+nano /etc/rc.local
+```
+Isi:
+```
+#!/bin/sh -e
+# rc.local — startup commands here
+
+# Start Bind9 (DNS server)
+service bind9 start
+
+exit 0
+```
+Lalu jalankan:
+```
+chmod +x /etc/rc.local
+bash -x /etc/rc.local
+ps aux | grep named
+dig @127.0.0.1 www.K32.com
+```
+3. Di Sirion
+```
+nano /etc/rc.local
+```
+Isi dengan:
+```
+#!/bin/sh -e
+# rc.local — startup commands here
+
+# Start Nginx (reverse proxy / static web)
+service nginx start
+
+exit 0
+```
+Uji dengan:
+```
+chmod +x /etc/rc.local
+bash -x /etc/rc.local
+ps aux | grep nginx
+curl -I http://www.K32.com
+curl -I http://www.K32.com/static/
+```
+4. Di Lindon
+```
+nano /etc/rc.local
+```
+Isi dengan: 
+```
+#!/bin/sh -e
+# rc.local — startup commands here
+
+# Start Nginx (static web)
+service nginx start
+
+exit 0
+```
+Uji
+```
+chmod +x /etc/rc.local
+bash -x /etc/rc.local
+ps aux | grep nginx
+curl -I http://www.K32.com
+curl -I http://www.K32.com/static/
+```
+5. Di Vingilot
+```
+nano /etc/rc.local
+```
+Isi dengan:
+```
+#!/bin/sh -e
+# rc.local — startup commands here
+
+# Start PHP-FPM daemon manually (karena systemctl nggak tersedia)
+php-fpm8.4 -D
+
+# Start Apache web server
+service apache2 start
+
+exit 0
+```
+Uji:
+```
+chmod +x /etc/rc.local
+bash -x /etc/rc.local
+ps aux | grep php-fpm
+ps aux | grep apache2
+curl -I http://www.K32.com/app/
+```
 ## Soal 18
-K
+Menambahkan alias dan identitas untuk “musuh” dengan membuat record melkor.K32.com (TXT berisi “Morgoth (Melkor)”) dan morgoth.K32.com (CNAME yang mengarah ke melkor.K32.com), lalu memastikan query TXT dan CNAME dari ns1 dan ns2 mengembalikan hasil sesuai.
 
 ---
-1. D
+1. Masuk ke Tirion (ns1)
+```
+nano /etc/bind/zones/db.K32.com
+```
+Isi dengan:
+```
+; Melkor - TXT & CNAME
+melkor   IN TXT   "Morgoth (Melkor)"
+morgoth  IN CNAME melkor.K32.com.
+```
+Validasi & Restart
+```
+named-checkzone K32.com /etc/bind/zones/db.K32.com
+service bind9 reload  ||  service bind9 restart
+```
+Verifikasi dari Earendil (client)
+```
+dig @192.227.3.3 TXT melkor.K32.com
+dig @192.227.3.3 morgoth.K32.com
+```
+Uji Sinkronisasi
+```
+dig @192.227.3.4 TXT melkor.K32.com
+dig @192.227.3.4 morgoth.K32.com
+```
 ## Soal 19
-K
+Menambahkan alias havens agar mengarah ke domain utama www.<xxxx>.com, dan memastikan resolusi DNS serta akses HTTP melalui hostname baru berfungsi dari dua klien berbeda.
 
 ---
-1. D
+1. Di Tirion (ns1)
+```
+nano /etc/bind/zones/db.K32.com
+```
+Isi dengan:
+```
+; Havens → www
+havens  IN CNAME www.K32.com.
+```
+Validasi & Reload BIND
+```
+named-checkzone K32.com /etc/bind/zones/db.K32.com
+service bind9 reload  ||  service bind9 restart
+```
+2. Di Earendil (client 1)
+```
+dig @192.227.3.3 havens.K32.com
+```
+Expected:
+havens.K32.com.  3600 IN CNAME www.K32.com.
+www.K32.com.     3600 IN A     192.227.3.2
+---
+Test konektivitas
+```
+ping -c 1 havens.K32.com
+curl -I http://havens.K32.com
+```
+Expected: HTTP/1.1 200 OK
+3. Di Elrond (client 2)
+Lakukan verifikasi yang sama
+```
+ping -c 1 havens.K32.com
+curl -I http://havens.K32.com
+```
 ## Soal 20
-K
+Server Sirion (192.227.3.2) dijadikan gateway utama (homepage) untuk seluruh domain www.K32.com. Pasang halaman depan (index.html) yang berjudul “War of Wrath: Lindon bertahan”, dengan dua tautan menuju aplikasi dan arsip:
+/app (reverse proxy ke Vingilot – 192.227.3.6)
+/static (reverse proxy ke Lindon – 192.227.3.5)
+Semua akses dari klien lain (Earendil, Elwing, dsb) harus lewat hostname www.K32.com, bukan IP langsung.
 
 ---
-1. D
+1. Di Sirion
+a) Edit halaman depan
+```
+nano /var/www/html/index.html
+```
+b) Isi dengan
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>War of Wrath: Lindon bertahan</title>
+  <style>
+    body {
+      background-color: #f0f2f5;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      color: #2c3e50;
+      font-size: 2em;
+      margin-bottom: 0.5em;
+    }
+    p {
+      color: #555;
+      margin-bottom: 1.5em;
+    }
+    a {
+      display: inline-block;
+      margin: 0 10px;
+      padding: 10px 20px;
+      background-color: #2980b9;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+    a:hover {
+      background-color: #1f5d82;
+    }
+  </style>
+</head>
+<body>
+  <h1>War of Wrath: Lindon bertahan</h1>
+  <p>Selamat datang di gerbang Sirion — jelajahi arsip dan aplikasi di bawah ini:</p>
+  <div>
+    <a href="/app">Menuju Aplikasi Vingilot (/app)</a>
+    <a href="/static">Jelajahi Arsip Lindon (/static)</a>
+  </div>
+</body>
+</html>
+```
+c) Edit konfigurasi Nginx
+```
+nano /etc/nginx/sites-available/redirect-www.conf
+```
+Isi dengan:
+```
+# ==========================
+# SIRION - Reverse Proxy + Canonical Redirect + Homepage
+# ==========================
+
+# === Block 1: Redirect semua akses non-kanonik ke www.K32.com ===
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+
+    return 301 http://www.K32.com$request_uri;
+}
+
+# === Block 2: Host utama (kanonik) ===
+server {
+    listen 80;
+    listen [::]:80;
+    server_name www.K32.com;
+
+    root /var/www/html;
+    index index.html index.php;
+
+    access_log /var/log/nginx/www.access.log;
+    error_log /var/log/nginx/www.error.log;
+
+    # Halaman depan
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Reverse proxy ke Lindon (/static)
+    location /static {
+        proxy_pass http://192.227.3.5/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # Reverse proxy ke Vingilot (/app)
+    location /app {
+        proxy_pass http://192.227.3.6/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # PHP handler (opsional)
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php8.4-fpm.sock;
+    }
+}
+```
+d) Test konfigurasi & reload
+```
+nginx -t
+service nginx reload
+```
+e) Testing di Earendil
+```
+ping -c 1 www.K32.com
+curl http://www.K32.com/
+curl http://www.K32.com/app
+curl http://www.K32.com/static/
+```
+---
+REVISI
+---
+## Soal 5
+Kurang memasukkan Eonwe ke : 
+```
+; Barat
+earendil   IN  A  192.227.1.2
+elwing     IN  A  192.227.1.3
+
+; Timur
+cirdan     IN  A  192.227.2.2
+elrond     IN  A  192.227.2.3
+maglor     IN  A  192.227.2.4
+verda      IN  A  192.227.2.5
+
+; DMZ
+sirion     IN  A  192.227.3.2
+tirion     IN  A  192.227.3.3
+valmar     IN  A  192.227.3.4
+lindon     IN  A  192.227.3.5
+vingilot   IN  A  192.227.3.6
+```
+Menjadi:
+```
+; Router Utama
+eonwe     IN  A  192.227.1.1
+
+; Barat
+earendil   IN  A  192.227.1.2
+elwing     IN  A  192.227.1.3
+
+; Timur
+cirdan     IN  A  192.227.2.2
+elrond     IN  A  192.227.2.3
+maglor     IN  A  192.227.2.4
+verda      IN  A  192.227.2.5
+
+; DMZ
+sirion     IN  A  192.227.3.2
+tirion     IN  A  192.227.3.3
+valmar     IN  A  192.227.3.4
+lindon     IN  A  192.227.3.5
+vingilot   IN  A  192.227.3.6
+```
+---
+## Soal 14
+---
+## Soal 19
