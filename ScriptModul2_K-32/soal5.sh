@@ -3,7 +3,7 @@
 nano /etc/bind/jarkom/K32.com
 **add**
 ```
-; Router Utama
+; Router
 eonwe     IN  A  192.227.1.1
 
 ; Barat
@@ -31,10 +31,10 @@ service bind9 restart
 ls /var/lib/bind/  ||  rndc retransfer K32.com
 
 check : ping <node>.K32.com <-- harus kecil semua
+
 in every node : (**MUST**)
 nano /etc/resolv.conf
 search K32.com
 nameserver 192.227.3.3
 nameserver 192.227.3.4
-
 nameserver 192.168.122.1

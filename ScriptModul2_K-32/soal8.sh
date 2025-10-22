@@ -1,5 +1,6 @@
 > in Tirion
 nano /etc/bind/named.conf.local
+'add':
 zone "3.227.192.in-addr.arpa" {
     type master;
     file "/etc/bind/jarkom/3.227.192.in-addr.arpa";

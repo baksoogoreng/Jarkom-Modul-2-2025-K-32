@@ -19,7 +19,6 @@ nameserver 192.168.122.1
 
 mkdir -p /etc/bind/jarkom
 nano /etc/bind/jarkom/K32.com
-
 $TTL    604800
 @       IN      SOA     ns1.K32.com. root.K32.com. (
                         2025101201 ; Serial

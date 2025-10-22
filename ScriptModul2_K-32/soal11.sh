@@ -33,7 +33,7 @@ nano /etc/apache2/sites-available/sirion.K32.com.conf
     CustomLog ${APACHE_LOG_DIR}/sirion_access.log combined
 </VirtualHost>
 
-a2ensite sirion.K32.com.conf
+a2ensite sirion.K32.com.conlynf
 a2dissite 000-default.conf   # opsional
 service apache2 reload
 service apache2 restart

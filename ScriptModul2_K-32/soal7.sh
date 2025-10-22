@@ -5,6 +5,7 @@ sirion      IN  A       192.227.3.2
 lindon      IN  A       192.227.3.5
 vingilot    IN  A       192.227.3.6 (udah seharusnya)
 
+; CNAME Records
 www         IN  CNAME   sirion.K32.com. <-- yang A di comment (;)
 static      IN  CNAME   lindon.K32.com.
 app         IN  CNAME   vingilot.K32.com.

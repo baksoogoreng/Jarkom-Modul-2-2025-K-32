@@ -20,15 +20,18 @@ iface eth3 inet static
 up iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 192.227.0.0/16
 
 > in CLI
-    /etc/resolv.conf
-    nameserver 192.168.122.1
-
-    /root/.bashrc
+```
+nano /root/.bashrc
     apt update
     apt install -y iptables
     iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 192.227.0.0/16
-    echo nameserver 192.168.122.1 > /etc/resolv.conf
-
+    cat << 'EOF' >> /etc/resolv.conf
+    search K32.com
+    nameserver 192.227.3.3
+    nameserver 192.227.3.4
+    nameserver 192.168.122.1
+    EOF
+```
 > Client Barat (Earendil & Elwing)
 auto eth0 (Earendil)
 iface eth0 inet static
@@ -43,11 +46,13 @@ iface eth0 inet static
     gateway 192.227.1.1
 
 > in CLI
-    /root/.bashrc
-    echo nameserver 192.168.122.1 > /etc/resolv.conf (DNS Resolver)
-    echo search K32.com > /etc/resolv.conf
-    echo nameserver 192.227.3.3 > /etc/resolv.conf
-    echo nameserver 192.227.3.4 > /etc/resolv.conf
+    nano /root/.bashrc
+    cat << 'EOF' >> /etc/resolv.conf
+    search K32.com
+    nameserver 192.227.3.3
+    nameserver 192.227.3.4
+    nameserver 192.168.122.1
+    EOF
 
     source /root/.bashrc
 
@@ -71,11 +76,13 @@ iface eth0 inet static
     gateway 192.227.2.1
 
 > in CLI
-    /root/.bashrc
-    echo nameserver 192.168.122.1 > /etc/resolv.conf (DNS Resolver)
-    echo search K32.com > /etc/resolv.conf
-    echo nameserver 192.227.3.3 > /etc/resolv.conf
-    echo nameserver 192.227.3.4 > /etc/resolv.conf
+    nano /root/.bashrc
+    cat << 'EOF' >> /etc/resolv.conf
+    search K32.com
+    nameserver 192.227.3.3
+    nameserver 192.227.3.4
+    nameserver 192.168.122.1
+    EOF
 
     source /root/.bashrc
 
@@ -116,11 +123,13 @@ iface eth0 inet static
     gateway 192.227.3.1
 
 > in CLI (each of them)
-    /root/.bashrc
-    echo nameserver 192.168.122.1 > /etc/resolv.conf (DNS Resolver)
-    echo search K32.com > /etc/resolv.conf
-    echo nameserver 192.227.3.3 > /etc/resolv.conf
-    echo nameserver 192.227.3.4 > /etc/resolv.conf
+    nano /root/.bashrc
+    cat << 'EOF' >> /etc/resolv.conf
+    search K32.com
+    nameserver 192.227.3.3
+    nameserver 192.227.3.4
+    nameserver 192.168.122.1
+    EOF
 
     source /root/.bashrc
 
