@@ -49,5 +49,9 @@ curl http://www.K32.com/static/
 curl http://www.K32.com/static/annals/catatan1.txt
 curl http://www.K32.com/static/annals/catatan2.txt
 
+lynx http://www.K32.com/static/
+
 curl http://www.K32.com/app/
 curl http://www.K32.com/app/about
+
+lynx http://www.K32.com/app/

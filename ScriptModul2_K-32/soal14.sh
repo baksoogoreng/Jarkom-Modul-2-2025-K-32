@@ -1,6 +1,12 @@
-//Buka Sirion
-nano /etc/nginx/sites-available/redirect-www.conf
+> in Sirion
+nano /etc/nginx/nginx.conf
+<!-- masukkan di http{} -->
+log_format proxy_realip '$remote_addr forwarded_for=$proxy_add_x_forwarded_for - $remote_user [$time_local] '
+                        '"$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"';
 
+DAN PASTIKAN DIATAS access_log /var/log/nginx/access.log; DI nginx.conf
+
+nano /etc/nginx/sites-available/redirect-www.conf
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
@@ -22,7 +28,8 @@ server {
 
     location / {               
         proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;       proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
 
         proxy_pass http://192.227.3.6;
     }
@@ -34,18 +41,24 @@ server {
     }
 }
 
+nginx -t
+service nginx reload
+
+> in Vingilot
+apt update
+apt install -y nginx
+
+service apache2 stop
 
 nano /etc/nginx/nginx.conf
-
 <!-- masukkan di http{} -->
 log_format proxy_realip '$remote_addr forwarded_for=$proxy_add_x_forwarded_for - $remote_user [$time_local] '
                         '"$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"';
 
-nano /etc/nginx/sites-available/redirect-www.conf
-<!-- tambahin right sebelum location \-->
-access_log /var/log/nginx/access.log proxy_realip;
+DAN PASTIKAN DIATAS access_log /var/log/nginx/access.log; DI nginx.conf
 
-<!-- server {
+nano /etc/nginx/sites-available/redirect-www.conf
+server {
     listen 80;
     listen [::]:80;
     server_name www.K32.com;
@@ -53,20 +66,18 @@ access_log /var/log/nginx/access.log proxy_realip;
     root /var/www/html;
     index index.html index.php;
 
-    # Log IP klien asli
     access_log /var/log/nginx/access.log proxy_realip;
 
     location / {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $host;
-
-        proxy_pass http://192.227.3.6;
+        try_files $uri $uri/ =404;
     }
-} -->
+}
 
 nginx -t
 service nginx reload
 
+> in Earendil (testing)
 curl -I http://www.K32.com
+
+> in Vingilot (to see the logs)
 tail -f /var/log/nginx/access.log

@@ -41,3 +41,5 @@ service apache2 status
 curl http://static.K32.com/index.html
 curl http://static.K32.com/annals/catatan1.txt
 curl http://static.K32.com/annals/catatan2.txt
+
+lynx http://static.K32.com/

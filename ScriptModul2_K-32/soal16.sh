@@ -3,7 +3,7 @@ nano /etc/bind/zones/db.K32.com
 > ubah semuanya
 $TTL 1h
 @   IN SOA  ns1.k32.com. admin.K32.com. (
-        2025101301
+        2025102201
         1h
         15m
         1w
@@ -22,14 +22,15 @@ ns2     IN A 192.227.3.4
 www     IN A 192.227.3.2
 sirion  IN A 192.227.3.2
 
-; Lindon – TTL 30 detik & IP baru
+; Lindon TTL 30 detik & IP baru
 lindon  30 IN A 192.227.3.99
 
-; Static → Lindon
+; Static Lindon
 static  IN CNAME lindon.K32.com.
 
 named-checkzone K32.com /etc/bind/zones/db.K32.com
 named-checkconf
+
 > kalau ada error,
 nano /etc/bind/named.conf.local
 zone "K32.com" {
@@ -51,5 +52,8 @@ named-checkzone K32.com /etc/bind/zones/db.K32.com
 named-checkconf
 service bind9 reload  ||  service bind9 restart
 
+> testing in Tirion
 ps aux | grep named
 dig @127.0.0.1 www.K32.com
+dig @127.0.0.1 static.K32.com +noall +answer
+dig lindon.K32.com

@@ -65,3 +65,5 @@ ping app.K32.com <-- for ensure
 
 curl http://app.K32.com/
 curl http://app.K32.com/about
+
+lynx http://app.K32.com/

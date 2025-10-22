@@ -63,19 +63,13 @@ curl -I http://www.K32.com/static/
 > in vingilot
 nano /etc/rc.local
 #!/bin/sh -e
-# rc.local — startup commands here
-
-# Start PHP-FPM daemon manually (karena systemctl nggak tersedia)
-php-fpm8.4 -D
-
-# Start Apache web server
-service apache2 start
-
+service php8.4-fpm start
+service nginx start
 exit 0
 
 chmod +x /etc/rc.local
 bash -x /etc/rc.local
 ps aux | grep php-fpm
-ps aux | grep apache2
+ps aux | grep nginx
 curl -I http://www.K32.com/app/
 

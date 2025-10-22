@@ -1,6 +1,6 @@
 > in tirion
 nano /etc/bind/zones/db.K32.com
-tambahkan di paling bawah
+tambahkan di paling bawah:
 ; Melkor - TXT & CNAME
 melkor   IN TXT   "Morgoth (Melkor)"
 morgoth  IN CNAME melkor.K32.com.

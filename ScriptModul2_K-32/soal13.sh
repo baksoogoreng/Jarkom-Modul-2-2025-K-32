@@ -41,6 +41,9 @@ dig @localhost K32.com A +short
 > in sirion
 service apache2 stop
 
+apt update
+apt install -y nginx
+
 nano /etc/nginx/sites-available/redirect-www.conf
 # ==========================
 # SIRION - Reverse Proxy / Canonical Redirect

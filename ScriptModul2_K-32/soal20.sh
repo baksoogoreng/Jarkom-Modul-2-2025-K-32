@@ -109,7 +109,6 @@ server {
     }
 }
 
-
 nginx -t
 service nginx reload
 
@@ -118,3 +117,7 @@ ping -c 1 www.K32.com
 curl http://www.K32.com/
 curl http://www.K32.com/app
 curl http://www.K32.com/static/
+
+lynx http://www.K32.com/
+lynx http://www.K32.com/app
+lynx http://www.K32.com/static/

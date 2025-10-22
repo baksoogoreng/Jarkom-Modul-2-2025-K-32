@@ -57,6 +57,8 @@ Percentage of the requests served within a certain time (ms)
   98%      5
   99%      7
  100%      8 (longest request)
+```
+
 root@Elrond:~# ab -n 500 -c 10 http://www.K32.com/static/
 This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
