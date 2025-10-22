@@ -3,6 +3,9 @@
 nano /etc/bind/jarkom/K32.com
 **add**
 ```
+; Router Utama
+eonwe     IN  A  192.227.1.1
+
 ; Barat
 earendil   IN  A  192.227.1.2
 elwing     IN  A  192.227.1.3
@@ -33,4 +36,5 @@ nano /etc/resolv.conf
 search K32.com
 nameserver 192.227.3.3
 nameserver 192.227.3.4
+
 nameserver 192.168.122.1
