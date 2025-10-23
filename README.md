@@ -978,6 +978,7 @@ curl -I http://sirion.K32.com
 curl -I http://192.227.3.2
 curl -I http://www.K32.com
 ```
+![no13](Assets/no13.png)
 ## Soal 14
 Konfigurasi agar Vingilot (web server aplikasi) mencatat alamat IP klien asli dalam access log — bukan IP dari Sirion (reverse proxy).
 
@@ -1043,6 +1044,7 @@ g) Cek hasil log di Sirion:
 ```
 tail -f /var/log/nginx/access.log
 ```
+![no14](Assets/no14.png)
 ## Soal 15
 Server diuji oleh Elrond menggunakan ApacheBench (ab) untuk mengukur performa endpoint /app/ dan /static/ di hostname kanonik www.K32.com. Masing-masing endpoint diuji sebanyak 500 request dengan 10 koneksi bersamaan (concurrency 10). Hasilnya kemudian dirangkum dalam tabel performa.
 
@@ -1061,6 +1063,7 @@ ab -n 500 -c 10 http://www.K32.com/app/
 ab -n 500 -c 10 http://www.K32.com/static/
 ```
 4. Catat hasil pengujian dalam tabel ringkas
+![no15](Assets/no15.png)
 ## Soal 16
 Kita diminta mengubah alamat IP (A record) untuk lindon.K32.com di DNS server Tirion (ns1). Karena static.K32.com adalah CNAME → lindon.K32.com, perubahan ini juga akan mempengaruhi alamat static.K32.com.
 
@@ -1158,6 +1161,7 @@ Setelah TTL habis (>30 detik):
 dig @192.227.3.3 static.K32.com A
 # harus berubah
 ```
+![no16](Assets/no16.png)
 ## Soal 17
 Memastikan bahwa seluruh layanan utama di setiap server akan otomatis aktif kembali setelah sistem direboot. Fokusnya adalah memastikan bahwa layanan DNS, web server, dan PHP-FPM dapat autostart agar sistem tetap berfungsi tanpa intervensi manual.
 
@@ -1183,6 +1187,7 @@ bash -x /etc/rc.local
 ps aux | grep named
 dig @127.0.0.1 www.K32.com
 ```
+![no17T](Assets/no17Tirion.png)
 2. Di Valmar (ns2)
 ```
 nano /etc/rc.local
@@ -1204,6 +1209,7 @@ bash -x /etc/rc.local
 ps aux | grep named
 dig @127.0.0.1 www.K32.com
 ```
+![no17V](Assets/no17Valmar.png)
 3. Di Sirion
 ```
 nano /etc/rc.local
@@ -1226,6 +1232,7 @@ ps aux | grep nginx
 curl -I http://www.K32.com
 curl -I http://www.K32.com/static/
 ```
+![no17S](Assets/no17Sirion.png)
 4. Di Lindon
 ```
 nano /etc/rc.local
@@ -1248,6 +1255,7 @@ ps aux | grep nginx
 curl -I http://www.K32.com
 curl -I http://www.K32.com/static/
 ```
+![no17L](Assets/no17Lindon.png)
 5. Di Vingilot
 ```
 nano /etc/rc.local
@@ -1273,6 +1281,7 @@ ps aux | grep php-fpm
 ps aux | grep apache2
 curl -I http://www.K32.com/app/
 ```
+![no17V](Assets/no17Vingilot.png)
 ## Soal 18
 Menambahkan alias dan identitas untuk “musuh” dengan membuat record melkor.K32.com (TXT berisi “Morgoth (Melkor)”) dan morgoth.K32.com (CNAME yang mengarah ke melkor.K32.com), lalu memastikan query TXT dan CNAME dari ns1 dan ns2 mengembalikan hasil sesuai.
 
@@ -1302,6 +1311,7 @@ Uji Sinkronisasi
 dig @192.227.3.4 TXT melkor.K32.com
 dig @192.227.3.4 morgoth.K32.com
 ```
+![no18](Assets/no18.png)
 ## Soal 19
 Menambahkan alias havens agar mengarah ke domain utama www.<xxxx>.com, dan memastikan resolusi DNS serta akses HTTP melalui hostname baru berfungsi dari dua klien berbeda.
 
@@ -1327,6 +1337,7 @@ dig @192.227.3.3 havens.K32.com
 Expected:
 havens.K32.com.  3600 IN CNAME www.K32.com.
 www.K32.com.     3600 IN A     192.227.3.2
+![no19](Assets/no19.1.png)
 ---
 Test konektivitas
 ```
@@ -1340,6 +1351,7 @@ Lakukan verifikasi yang sama
 ping -c 1 havens.K32.com
 curl -I http://havens.K32.com
 ```
+![no19](Assets/no19.png)
 ## Soal 20
 Server Sirion (192.227.3.2) dijadikan gateway utama (homepage) untuk seluruh domain www.K32.com. Pasang halaman depan (index.html) yang berjudul “War of Wrath: Lindon bertahan”, dengan dua tautan menuju aplikasi dan arsip:
 /app (reverse proxy ke Vingilot – 192.227.3.6)
@@ -1404,6 +1416,7 @@ b) Isi dengan
 </body>
 </html>
 ```
+![no20](Assets/no20.png)
 c) Edit konfigurasi Nginx
 ```
 nano /etc/nginx/sites-available/redirect-www.conf
@@ -1475,6 +1488,10 @@ curl http://www.K32.com/
 curl http://www.K32.com/app
 curl http://www.K32.com/static/
 ```
+
+![no18](Assets/no20.1.png)
+![no18](Assets/no20.2.png)
+
 ---
 REVISI
 ---
@@ -1521,6 +1538,23 @@ lindon     IN  A  192.227.3.5
 vingilot   IN  A  192.227.3.6
 ```
 ---
+
 ## Soal 14
+Lokasi logging seharusnya ada di Vingilot bukan Sirion. 
+Sirion hanya berfungsi menjadi reverse proxy, meneruskan IP asli via:
+```
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+```
+Vingilot punya konfigurasi baru
+```
+access_log /var/log/nginx/access.log proxy_realip;
+```
+Sehingga log akan menampilkan 
+```
+192.227.1.2 forwarded_for=192.227.1.2 - - [22/Oct/2025:15:10:55 +0700] "GET / HTTP/1.1" 200 ...
+```
+
 ---
 ## Soal 19
+Pada awalnya terdapat revisi/kesalahan, harusnya muncul pesan dari vingilot ketika menjalankan lynx. Tetapi dengan melakukan revisi pada nomor-nomor sebelumnya, problem ini sudah tersolved tanpa mengubah skrip nomor 19.
